@@ -1,4 +1,4 @@
-from data.modelo.producto import Producto,Venta
+from data.modelo.producto import Producto, Venta, Orden
 
 class DaoProducto:
     
@@ -156,6 +156,38 @@ class DaoCliente:
         row = cursor.fetchone()
         cursor.close()
         return row
+
+class DaoOrden:
+    def __init__(self, database):
+        self.database = database
+
+    def insert(self, cliente_id: int, detalles: str):
+        """Inserta un nuevo pedido en la tabla 'orden'"""
+        cursor = self.database.cursor()
+        query = "INSERT INTO orden (cliente_id, detalles) VALUES (%s, %s)"
+        cursor.execute(query, (cliente_id, detalles))
+        self.database.commit()
+        orden_id = cursor.lastrowid
+        cursor.close()
+        return orden_id
+
+    def get_by_cliente_id(self, cliente_id: int) -> list[Orden]:
+        """Obtiene todos los pedidos de un cliente por su ID"""
+        cursor = self.database.cursor()
+        query = "SELECT id, fecha, detalles, cliente_id FROM orden WHERE cliente_id = %s"
+        cursor.execute(query, (cliente_id,))
+        rows = cursor.fetchall()
+        cursor.close()
+        return [Orden(*row) for row in rows]
+
+    def get_all(self) -> list[Orden]:
+        """Obtiene todos los pedidos"""
+        cursor = self.database.cursor()
+        query = "SELECT id, fecha, detalles, cliente_id FROM orden"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        cursor.close()
+        return [Orden(*row) for row in rows]
 
 
 
