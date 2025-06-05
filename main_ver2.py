@@ -4,7 +4,7 @@ import os
 from collections import defaultdict
 import calendar
 from datetime import datetime
-from data.dao.dao_productos import DaoProducto, DaoEmpleado, DaoVentas,DaoTicket
+from data.dao.dao_productos import DaoProducto, DaoEmpleado,DaoVentas,DaoTicket,DaoOrden
 from data.database import database
 from data.modelo.producto import Producto
 
@@ -52,6 +52,9 @@ class MainApp:
         tk.Button(nav_frame, text="Transacciones", command=self.show_financia, 
                  bg="#3498db", fg="white", font=("Arial", 12), 
                  relief="flat", padx=20).pack(side="left", padx=5, pady=10)
+        tk.Button(nav_frame, text="Órdenes", command=self.show_ordenes, 
+                 bg="#3498db", fg="white", font=("Arial", 12), 
+                 relief="flat", padx=20).pack(side="left", padx=5, pady=10)
         
         tk.Label(nav_frame, text=f"Usuario: {empleado_nombre}", 
                 bg="#2c3e50", fg="white", font=("Arial", 10)).pack(side="right", padx=10, pady=10)
@@ -68,7 +71,7 @@ class MainApp:
 
         # Inicializar frames
         self.frames = {}
-        for F in (InicioFrame, GestionProductosFrame, CobrarFrame, FinanciaFrame):
+        for F in (InicioFrame, GestionProductosFrame, CobrarFrame, FinanciaFrame, OrdenFrame):
             page_name = F.__name__
             frame = F(parent=self.content_frame, controller=self)
             self.frames[page_name] = frame
@@ -90,6 +93,10 @@ class MainApp:
     def show_financia(self):
         self.frames["FinanciaFrame"].tkraise()
         self.frames["FinanciaFrame"].load_ventas()
+
+    def show_ordenes(self):
+        self.frames["OrdenFrame"].tkraise()
+        self.frames["OrdenFrame"].load_ordenes()
 
     def logout(self):
         """Cerrar sesión y volver a la ventana de inicio de sesión"""
@@ -1287,6 +1294,83 @@ Mejor empleado: {mejor_empleado[0]} ({mejor_empleado[1]} ventas)
             
         except Exception as e:
             messagebox.showerror("Error", f"Error al exportar: {str(e)}")
+class OrdenFrame(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg="#ecf0f1")
+        self.controller = controller
+        self.dao_orden = DaoOrden(database)  # Asegúrate de que DaoOrden tenga métodos para interactuar con la tabla 'orden'
+
+        # Título
+        tk.Label(self, text="Detalles de Órdenes", 
+                 font=("Arial", 18, "bold"), bg="#ecf0f1", fg="#2c3e50").pack(pady=20)
+
+        # Botón para recargar datos
+        tk.Button(self, text="Cargar Órdenes", command=self.load_ordenes,
+                  bg="#3498db", fg="white", font=("Arial", 12), padx=20).pack(pady=10)
+
+        # Tabla de órdenes
+        columns = ("ID", "Cliente ID", "Detalle", "Fecha")
+        self.tree = ttk.Treeview(self, columns=columns, show="headings", height=15)
+        
+        for col in columns:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=200 if col == "Detalle" else 100)
+        
+        # Scrollbar
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scrollbar.set)
+        
+        self.tree.pack(side="left", fill="both", expand=True, padx=20, pady=10)
+        scrollbar.pack(side="right", fill="y", pady=10)
+
+        # Botón para ver detalles
+        tk.Button(self, text="Ver Detalles", command=self.ver_detalle,
+                  bg="#27ae60", fg="white", font=("Arial", 12), padx=20).pack(pady=10)
+
+    def load_ordenes(self):
+        """Cargar órdenes desde la base de datos"""
+        # Limpiar tabla
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+        
+        try:
+            # Obtener órdenes desde la base de datos
+            ordenes = self.dao_orden.get_all_ordenes()  # Método que debes implementar en DaoOrden
+            for orden in ordenes:
+                self.tree.insert("", "end", values=(orden.id, orden.fecha, orden.detalles, orden.cliente_id))
+        except Exception as e:
+            messagebox.showerror("Error", f"Error al cargar órdenes: {str(e)}")
+
+    def ver_detalle(self):
+        """Abrir ventana con detalles de la orden seleccionada"""
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showwarning("Advertencia", "Seleccione una orden para ver los detalles")
+            return
+        
+        item = selected_item[0]
+        values = self.tree.item(item, "values")
+        detalle = values[2]  # Columna de detalles
+
+        # Crear ventana de detalles
+        detalle_window = tk.Toplevel(self)
+        detalle_window.title("Detalles de la Orden")
+        detalle_window.geometry("500x400")
+        detalle_window.resizable(False, False)
+        detalle_window.configure(bg="#ecf0f1")
+
+        # Mostrar detalles
+        tk.Label(detalle_window, text="Detalles de la Orden", 
+                 font=("Arial", 16, "bold"), bg="#ecf0f1", fg="#2c3e50").pack(pady=20)
+        
+        detalle_text = tk.Text(detalle_window, wrap="word", font=("Arial", 12), bg="#ffffff", fg="#2c3e50")
+        detalle_text.insert("1.0", detalle)
+        detalle_text.config(state="disabled")  # Hacer que el texto sea de solo lectura
+        detalle_text.pack(padx=20, pady=10, fill="both", expand=True)
+
+        # Botón para cerrar la ventana
+        tk.Button(detalle_window, text="Cerrar", command=detalle_window.destroy,
+                  bg="#e74c3c", fg="white", font=("Arial", 12), padx=20).pack(pady=10)
 class LoginWindow:
     def __init__(self, root):
         self.root = root

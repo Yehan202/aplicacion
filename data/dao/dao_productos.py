@@ -174,7 +174,7 @@ class DaoOrden:
     def get_by_cliente_id(self, cliente_id: int) -> list[Orden]:
         """Obtiene todos los pedidos de un cliente por su ID"""
         cursor = self.database.cursor()
-        query = "SELECT id, fecha, detalles, cliente_id FROM orden WHERE cliente_id = %s"
+        query = "SELECT id, cliente_id, detalles, fecha FROM orden WHERE cliente_id = %s"
         cursor.execute(query, (cliente_id,))
         rows = cursor.fetchall()
         cursor.close()
@@ -183,11 +183,20 @@ class DaoOrden:
     def get_all(self) -> list[Orden]:
         """Obtiene todos los pedidos"""
         cursor = self.database.cursor()
-        query = "SELECT id, fecha, detalles, cliente_id FROM orden"
+        query = "SELECT id, cliente_id, detalles, fecha FROM orden"
         cursor.execute(query)
         rows = cursor.fetchall()
         cursor.close()
         return [Orden(*row) for row in rows]
+    
+    def get_all_ordenes(self):
+        """Obtiene todas las órdenes de la tabla 'orden'"""
+        cursor = self.database.cursor()
+        query = "SELECT id, cliente_id, detalles, fecha FROM orden"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        cursor.close()
+        return [Orden(*row) for row in rows]  # Asegúrate de tener una clase Orden para mapear los datos
 
 
 
