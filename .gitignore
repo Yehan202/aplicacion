@@ -8,6 +8,15 @@ __pycache__/
 *$py.class
 
 # C extensions
+
+# Ignore image files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.svg
 *.so
 
 # Distribution / packaging
