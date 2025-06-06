@@ -466,8 +466,15 @@ class CobrarFrame(tk.Frame):
                     productos_texto.append(f"{nombre}: {info['cantidad']} x ${info['precio']:.2f} = ${info['subtotal']:.2f}")
             
             detalle_pedido = "\n".join(productos_texto)
+
+            # Ventana emergente para ingresar la dirección
+            direccion = self._solicitar_direccion()
+            if not direccion:
+                return  # Si el usuario cancela, no se procesa el pedido
+
             detalle_completo = (
                 f"Cliente: {self.controller.cliente_nombre} (ID: {self.controller.cliente_id})\n"
+                f"Dirección: {direccion}\n"
                 f"Productos:\n{detalle_pedido}\n"
                 f"Total: ${total:.2f}\n"
                 f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
@@ -480,7 +487,7 @@ class CobrarFrame(tk.Frame):
             # Insertar en la tabla 'orden'
             cursor = database.cursor()
             query = """
-                INSERT INTO orden (cliente_id, detalles,fecha)
+                INSERT INTO orden (cliente_id, detalles, fecha)
                 VALUES (%s, %s, NOW())
             """
             cursor.execute(query, (self.controller.cliente_id, detalle_completo))
@@ -500,6 +507,57 @@ class CobrarFrame(tk.Frame):
             messagebox.showerror("Error", f"Error al procesar pedido: {str(e)}")
 
 
+    def _solicitar_direccion(self):
+        """Muestra una ventana emergente para solicitar la dirección"""
+        popup = tk.Toplevel(self)
+        popup.title("Ingresar Dirección")
+        popup.geometry("400x400")
+        popup.transient(self)
+        popup.grab_set()
+
+        tk.Label(popup, text="Calle y Número:", font=("Arial", 12)).pack(pady=5)
+        calle_entry = tk.Entry(popup, font=("Arial", 12), width=30)
+        calle_entry.pack(pady=5)
+
+        tk.Label(popup, text="Portal:", font=("Arial", 12)).pack(pady=5)
+        portal_entry = tk.Entry(popup, font=("Arial", 12), width=30)
+        portal_entry.pack(pady=5)
+
+        tk.Label(popup, text="Ciudad:", font=("Arial", 12)).pack(pady=5)
+        ciudad_entry = tk.Entry(popup, font=("Arial", 12), width=30)
+        ciudad_entry.pack(pady=5)
+
+        tk.Label(popup, text="Código Postal:", font=("Arial", 12)).pack(pady=5)
+        codigo_postal_entry = tk.Entry(popup, font=("Arial", 12), width=30)
+        codigo_postal_entry.pack(pady=5)
+
+        direccion = {}
+
+        def confirmar():
+            """Recoge los datos de la dirección y cierra la ventana"""
+            calle = calle_entry.get().strip()
+            portal = portal_entry.get().strip()
+            ciudad = ciudad_entry.get().strip()
+            codigo_postal = codigo_postal_entry.get().strip()
+
+            if not calle or not portal or not ciudad or not codigo_postal:
+                messagebox.showerror("Error", "Todos los campos son obligatorios.")
+                return
+
+            direccion["calle"] = calle
+            direccion["portal"] = portal
+            direccion["ciudad"] = ciudad
+            direccion["codigo_postal"] = codigo_postal
+            popup.destroy()
+
+        tk.Button(popup, text="Confirmar", command=confirmar, 
+                  bg="#4CAF50", fg="white", font=("Arial", 12)).pack(pady=20)
+
+        popup.wait_window()  # Esperar a que se cierre la ventana
+
+        if direccion:
+            return f"{direccion['calle']}, Portal {direccion['portal']}, {direccion['ciudad']}, CP {direccion['codigo_postal']}"
+        return None
 # Punto de entrada
 if __name__ == "__main__":
     login_root = tk.Tk()

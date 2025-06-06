@@ -111,7 +111,7 @@ class InicioFrame(tk.Frame):
         self.controller = controller
         
         
-        logo_img = Image.open("logo.png")  # 请将logo图片命名为logo.png并放在项目根目录或指定路径
+        logo_img = Image.open('./server/logo.png')  # 请将logo图片命名为logo.png并放在项目根目录或指定路径
         logo_img = logo_img.resize((200, 200))  # 根据需要调整大小
         self.logo_photo = ImageTk.PhotoImage(logo_img)
         tk.Label(self, image=self.logo_photo).pack(pady=20)
