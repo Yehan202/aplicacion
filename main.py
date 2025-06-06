@@ -252,7 +252,7 @@ class GestionProductosFrame(tk.Frame):
                 messagebox.showerror("Error", "Precio y cantidad deben ser números válidos")
 
         tk.Button(add_window, text="Guardar", command=save_producto,
-                  bg="#27ae60", fg="white", font=("Arial", 10), padx=20).pack(pady=20)
+                  bg="#27ae60", fg="white", font=("Arial", 10), padx=20).pack(pady=10)
 
     def update_producto(self):
         """Abrir ventana para actualizar un producto seleccionado"""
@@ -320,7 +320,7 @@ class GestionProductosFrame(tk.Frame):
                 messagebox.showerror("Error", "Precio y cantidad deben ser números válidos")
 
         tk.Button(update_window, text="Guardar Cambios", command=save_changes,
-                  bg="#f39c12", fg="white", font=("Arial", 10), padx=20).pack(pady=20)
+                  bg="#f39c12", fg="white", font=("Arial", 10), padx=20).pack(pady=10)
 
     def delete_producto(self):
         """Eliminar un producto seleccionado"""
@@ -1412,15 +1412,18 @@ class LoginWindow:
         
         # Botones
         button_frame = tk.Frame(form_frame, bg="#34495e")
-        button_frame.pack(pady=20)
+        button_frame.pack(pady=10)
         
         tk.Button(button_frame, text="Ingresar", command=self.login,
                  bg="#27ae60", fg="white", font=("Arial", 12, "bold"), 
-                 padx=20, pady=5).pack(side="left", padx=10)
+                 padx=20, pady=5).pack(side="left", padx=5)
         
         tk.Button(button_frame, text="Crear Usuario", command=self.crear_empleado,
                  bg="#3498db", fg="white", font=("Arial", 12, "bold"), 
-                 padx=20, pady=5).pack(side="left", padx=10)
+                 padx=20, pady=5).pack(side="left", padx=5)
+        tk.Button(button_frame, text="Salir", command=self.root.quit,
+                 bg="#e74c3c", fg="white", font=("Arial", 12, "bold"), 
+                 padx=20, pady=5).pack(side="left", padx=5)
         
         # Bind Enter key
         self.nombre_entry.bind("<Return>", lambda event: self.login())
