@@ -1,0 +1,6 @@
+SELECT c.id, c.nombre, v.total, v.fecha_hora, t.ticket
+FROM Ventas v 
+JOIN Cliente c ON v.cliente_id = c.id
+JOIN ticket t ON v.cliente_id = t.cliente_id
+WHERE c.id = "x",
+ORDER BY v.fecha_hora DESC;
