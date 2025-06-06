@@ -338,7 +338,7 @@ class GestionProductosFrame(tk.Frame):
 
 
 class CobrarFrame(tk.Frame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller):  # Punto de Venta
         super().__init__(parent, bg="#ecf0f1")
         self.controller = controller
         self.dao = DaoProducto()
@@ -349,7 +349,7 @@ class CobrarFrame(tk.Frame):
         self.setup_ui()
         self.refresh_products()
 
-    def setup_ui(self):
+    def setup_ui(self): # Configura la interfaz de usuario
         """Configura la interfaz de usuario"""
         # Título
         title_label = tk.Label(self, text="Punto de Venta", 
@@ -579,7 +579,7 @@ class CobrarFrame(tk.Frame):
         button.bind("<Enter>", on_enter)
         button.bind("<Leave>", on_leave)
 
-    def lighten_color(self, color):
+    def lighten_color(self, color):  # Aclara un color para el efecto hover
         """Aclara un color para el efecto hover"""
         color_map = {
             "#27ae60": "#2ecc71",
@@ -588,7 +588,7 @@ class CobrarFrame(tk.Frame):
         }
         return color_map.get(color, color)
 
-    def filter_products(self, event=None):
+    def filter_products(self, event=None):  # Filtra productos por categoría
         """Filtra productos por categoría"""
         self.refresh_products()
 
@@ -686,7 +686,7 @@ class CobrarFrame(tk.Frame):
         
         self.total_label.config(text=f"Total: ${total:.2f}")
 
-    def remove_from_cart(self):
+    def remove_from_cart(self): 
         """Remueve completamente un producto del carrito"""
         selected = self.cart_tree.selection()
         if not selected:
@@ -711,8 +711,9 @@ class CobrarFrame(tk.Frame):
             self.cart_items.clear()
             self.refresh_cart()
 
-    def realizar_cobro(self):
+    def realizar_cobro(self): # Procesa la venta
         """Procesa la venta"""
+        
         try:
             # Calcular total
             total = sum(float(info["subtotal"]) for info in self.cart_items.values() if info["cantidad"] > 0)
@@ -743,7 +744,7 @@ class CobrarFrame(tk.Frame):
         except Exception as e:
             messagebox.showerror("Error", f"Error al procesar cobro: {str(e)}")
 
-    def open_payment_window(self, total, cliente_id, empleado_id):
+    def open_payment_window(self, total, cliente_id, empleado_id):  # Abre la ventana de procesamiento de pago
         """Abre la ventana de procesamiento de pago"""
         cobro_window = tk.Toplevel(self)
         cobro_window.title("Procesar Venta")
