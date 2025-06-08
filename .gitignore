@@ -9,16 +9,6 @@ __pycache__/
 
 # C extensions
 
-# Ignore image files
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.tiff
-*.svg
-*.so
-
 # Distribution / packaging
 .Python
 build/
