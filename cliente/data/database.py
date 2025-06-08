@@ -5,6 +5,6 @@ database = mysql.connector.connect(
     port=6033,
     ssl_disabled=True,
     user='root',
-    password='my_secret_password',
+    password='root',
     database='productos'  
 )

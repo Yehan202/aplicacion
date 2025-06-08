@@ -10,34 +10,35 @@ CREATE TABLE Cliente (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(255) NOT NULL,
     contacto VARCHAR(255),
-    fechaRegistro DATE
+    fecha_registro DATE
 );
 
 CREATE TABLE Empleado (
-    EmpleadoID INT PRIMARY KEY AUTO_INCREMENT,
-    Nombre VARCHAR(255) NOT NULL
-    );
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE ticket (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente VARCHAR(255) ,
-    ticket LONGBLOB NOT NULL
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    cliente_id INT,
+    ticket LONGBLOB NOT NULL,
     FOREIGN KEY (cliente_id) REFERENCES Cliente(id)
 );
 
 CREATE TABLE orden (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    fecha_hora DATETIME NOT NULL,
+    fecha DATETIME NOT NULL,
     cliente_id INT,
-    detalle text
-    FOREIGN KEY (ClienteID) REFERENCES Cliente(id),
- );
+    detalles TEXT,
+    FOREIGN KEY (cliente_id) REFERENCES Cliente(id)
+);
 
 CREATE TABLE Ventas (
     id INT PRIMARY KEY AUTO_INCREMENT,
     fecha_hora DATETIME NOT NULL,
     cliente_id INT,
     total DECIMAL(10, 2),
-    empleadoID INT,
-    FOREIGN KEY (ClienteID) REFERENCES Cliente(id),
-    FOREIGN KEY (EmpleadoID) REFERENCES Empleado(id)
+    empleado_id INT,
+    FOREIGN KEY (cliente_id) REFERENCES Cliente(id),
+    FOREIGN KEY (empleado_id) REFERENCES Empleado(id)
 );
